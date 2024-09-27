@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Formulaire de Connexion</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+      <div class="container">
+        <h1 class="kingster-page-title">Pre-Inscription</h1>
+
+        <div id="message" style="color: green"></div>
+
+        <form id="inscriptions">
+          <div class="input-container">
+            <label for="name">Nom</label>
+            <input type="text" name="nom" required id="name" />
+          </div>
+          <div class="input-container">
+            <label for="prenom">Prénom</label>
+            <input type="text" name="prenom" required id="prenom" />
+          </div>
+          <div class="input-container">
+            <label for="email">E-mail</label>
+            <input type="email" name="email" required id="email" />
+          </div>
+          <div class="input-container">
+            <label for="classe">Classe à faire</label>
+            <input type="text" name="classe" required id="classe" />
+          </div>
+          <div class="input-container">
+            <label for="ecole">Dernière école fréquentée</label>
+            <input type="text" name="ecole" required id="ecole" />
+          </div>
+          <div class="input-container">
+            <label for="telephone">Téléphone responsable</label>
+            <input type="tel" name="telephone" required id="telephone" />
+          </div>
+          <div class="input-container">
+            <label for="password">Mot de passe</label>
+            <input type="password" id="password" name="password" required />
+          </div>
+          <div class="input-container">
+            <label for="appointmentDate">Date de Rendez-vous</label>
+            <input
+              type="date"
+              id="appointmentDate"
+              name="appointmentDate"
+              required
+            />
+          </div>
+          <div class="input-container">
+            <label for="appointmentTime">Heure de Rendez-vous</label>
+            <input
+              type="time"
+              id="appointmentTime"
+              name="appointmentTime"
+              required
+            />
+          </div>
+          <input type="submit" value="Envoyer" />
+        </form>
+      </div>
+    </main>
+
+    <script>
+      document
+        .getElementById("inscriptions")
+        .addEventListener("submit", function (event) {
+          event.preventDefault(); // Empêche le rechargement de la page
+
+          const formData = new FormData(this);
+          const data = {};
+          formData.forEach((value, key) => {
+            data[key] = value;
+          });
+
+          // Remplacer l'URL par celle de ton serveur déployé
+          fetch("https://had-umber.vercel.app", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("Erreur réseau, statut: " + response.status);
+              }
+              return response.json();
+            })
+            .then((data) => {
+              const messageElement = document.getElementById("message");
+              messageElement.style.color = "green"; // Message de succès
+              messageElement.innerText = data.message;
+              console.log("Réponse du serveur:", data);
+              this.reset(); // Réinitialiser le formulaire après succès
+            })
+            .catch((error) => {
+              const messageElement = document.getElementById("message");
+              messageElement.style.color = "red"; // Message d'erreur
+
+              // Vérification de l'erreur
+              if (error instanceof TypeError) {
+                messageElement.innerText =
+                  "Erreur réseau : veuillez vérifier votre connexion.";
+              } else {
+                messageElement.innerText =
+                  "Erreur lors de l'enregistrement : " + error.message;
+              }
+
+              console.error("Erreur:", error);
+            });
+        });
+    </script>
+  </body>
+</html>
